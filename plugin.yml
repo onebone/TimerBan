@@ -1,0 +1,25 @@
+name: TimerBan
+author: onebone
+api:
+- 1.2.0
+- 1.2.1
+version: "2.0"
+main: onebone\timerban\TimerBan
+commands:
+ timerban:
+  usage: /timerban <player> <time> [reason...]
+  permission: timerban.command.timerban;timerban.command.timerban.add;timerban.command.timerban.pardon;timerban.command.timerban.list
+ timerbanip:
+  usage: /timerbanip <player|IP> <time> [reason...]
+  permission: timerban.command.timerbanip;timerban.command.timerbanip.add;timerban.command.timerbanip.pardon;timerban.command.timerbanip.list
+permissions:
+ timerban.*:
+  description: Allows all permission of TimerBan
+  children:
+   timerban.command.*:
+    description: Allows all commands of TimerBan
+    children:
+     timerban.command.timerban:
+      description: Allows ban command
+     timerban.command.timerbanip:
+      description: Allows IP ban command
