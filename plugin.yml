@@ -3,14 +3,14 @@ author: onebone
 api:
 - 1.2.0
 - 1.2.1
-version: "2.0"
+version: "2.1"
 main: onebone\timerban\TimerBan
 commands:
  timerban:
-  usage: /timerban <player> <time> [reason...]
+  usage: /timerban <add|remove|list> <player> <time> [reason...]
   permission: timerban.command.timerban;timerban.command.timerban.add;timerban.command.timerban.pardon;timerban.command.timerban.list
  timerbanip:
-  usage: /timerbanip <player|IP> <time> [reason...]
+  usage: /timerbanip <add|remove|list> <player|IP> <time> [reason...]
   permission: timerban.command.timerbanip;timerban.command.timerbanip.add;timerban.command.timerbanip.pardon;timerban.command.timerbanip.list
 permissions:
  timerban.*:
