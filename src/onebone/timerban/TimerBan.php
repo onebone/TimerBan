@@ -14,17 +14,104 @@ use pocketmine\Player;
 class TimerBan extends PluginBase implements Listener{
 	private $banList;
 	private $ipBanList;
-	
+
+	/**
+	 * Bans player for specific time
+	 *
+	 * @var Player|string	$player
+	 * @var float					$time
+	 *
+	 * @return bool
+	 */
+	public function banPlayer($player, $time){
+		if($player instanceof Player){
+			$player = $player->getName();
+		}
+		$player = strtolower($player);
+		if($this->banList->exists($player)){
+			return false;
+		}
+		$seconds = $time * 3600; // hours to seconds
+
+		$due = $seconds + time();
+		$this->banList->set($player, $due);
+		return true;
+	}
+
+	/**
+	 * Bans IP address for specific time
+	 *
+	 * @var Player|string	$address
+	 * @var float		$time
+	 *
+	 * @return bool
+	 */
+	public function banAddress($address, $time){
+		if($player instanceof Player){
+			$player = $player->getAddress();
+		}
+		if(filter_var($address, FILTER_VALIDATE_IP)){
+			if($this->ipBanList->exists($address)){
+				return false;
+			}
+			$seconds = $time * 3600;
+
+			$due = $seconds + time();
+			$this->ipBanList->set($address, $due);
+			return true;
+		}else{
+			return false;
+		}
+	}
+
+	/**
+	 * Returns if player is banned or not
+	 *
+	 * @var Player|string	$player
+	 *
+	 * @return bool|int
+	 */
+	public function isBanned($player){
+		if($player instanceof Player){
+			$player = $player->getName();
+		}
+		$player = strtolower($player);
+
+		if($this->banList->exists($player)){
+			return $this->banList->get($player);
+		}
+		return false;
+	}
+
+	/**
+	 * Returns if player is banned or not
+	 *
+	 * @var Player|string	$address
+	 *
+	 * @return bool|int
+	 */
+	public function isAddressBanned($address){
+		if($player instanceof Player){
+			$player = $player->getAddress();
+		}
+
+		if($this->ipBanList->exists($address)){
+			return $this->ipBanList->get($address);
+		}
+		return false;
+	}
+
+	// NON API PART
 	public function onEnable(){
 		if(!file_exists($this->getDataFolder())){
 			mkdir($this->getDataFolder());
 		}
-		
+
 		$this->banList = new Config($this->getDataFolder()."BanList.yml", Config::YAML);
 		$this->ipBanList = new Config($this->getDataFolder()."IPBanList.yml", Config::YAML);
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
 	}
-	
+
 	public function onPlayerLogin(PlayerPreLoginEvent $event){
 		$player = $event->getPlayer();
 		$now = time();
@@ -46,7 +133,7 @@ class TimerBan extends PluginBase implements Listener{
 			}
 		}
 	}
-	
+
 	public function onCommand(CommandSender $sender, Command $command, $label, array $params){
 		switch($command->getName()){
 			case "timerban":
@@ -62,14 +149,14 @@ class TimerBan extends PluginBase implements Listener{
 					}
 					$after = round($after, 2);
 					$secAfter = $after*3600;
-					
+
 					$due = $secAfter + time();
-					
+
 					$this->banList->set(strtolower($player), $due);
 					$this->banList->save();
-					
+
 					$sender->sendMessage("[TimerBan] $player has been banned for $after hour(s).");
-					
+
 					if(($player = $this->getServer()->getPlayer($player)) instanceof Player){
 						$player->kick("You have been banned for $after hour(s).");
 					}
@@ -77,17 +164,17 @@ class TimerBan extends PluginBase implements Listener{
 					case "remove":
 					case "pardon":
 					$player = array_shift($params);
-					
+
 					if(trim($player) === ""){
 						$sender->sendMessage("[TimerBan] Usage: /timerban remove <player>");
 						break;
 					}
-					
+
 					if(!$this->banList->exists($player)){
 						$sender->sendMessage("[TimerBan] There is no player named \"$player\"");
 						break;
 					}
-					
+
 					$this->banList->remove($player);
 					$this->banList->save();
 					$sender->sendMessage("[TimerBan] \"$player\" have been removed from the ban list.");
@@ -134,26 +221,26 @@ class TimerBan extends PluginBase implements Listener{
 					}
 
 					$due = $secAfter + time();
-					
+
 					$this->ipBanList->set($ip, $due);
 					$this->ipBanList->save();
-					
+
 					$sender->sendMessage("[TimerBan] $ip has been banned for $after hours.");
 					break;
 					case "remove":
 					case "pardon":
 					$player = array_shift($params);
-					
+
 					if(trim($player) === ""){
 						$sender->sendMessage("[TimerBan] Usage: /timerban remove <player>");
 						break;
 					}
-					
+
 					if(!$this->ipBanList->exists($player)){
 						$sender->sendMessage("[TimerBan] There is no player with IP \"$player\"");
 						break;
 					}
-					
+
 					$this->ipBanList->remove($player);
 					$this->ipBanList->save();
 					$sender->sendMessage("[TimerBan] \"$player\" have been removed from the ban list.");
