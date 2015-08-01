@@ -91,8 +91,8 @@ class TimerBan extends PluginBase implements Listener{
 	 * @return bool|int
 	 */
 	public function isAddressBanned($address){
-		if($player instanceof Player){
-			$player = $player->getAddress();
+		if($address instanceof Player){
+			$address = $address->getAddress();
 		}
 
 		if($this->ipBanList->exists($address)){
