@@ -117,7 +117,8 @@ class TimerBan extends PluginBase implements Listener{
 		$now = time();
 		if($this->banList->exists(strtolower($player->getName()))){
 			if($this->banList->get($player->getName()) > $now){
-				$player->close("", "You are banned");
+				$time = ($this->banList->get(strtolower($player->getName())) - $now) / 3600;
+				$player->close("", "You are banned. You'll unban through - ".(int)$time." hour(s)");
 				$event->setCancelled();
 			}else{
 				$this->banList->remove($player->getName());
@@ -126,7 +127,8 @@ class TimerBan extends PluginBase implements Listener{
 		}
 		if($this->ipBanList->exists($player->getAddress())){
 			if($this->ipBanList->get($player->getAddress()) > $now){
-				$player->close("", "You are banned");
+				$time = ($this->banList->get(strtolower($player->getName())) - $now) / 3600;
+				$player->close("", "You are banned. You'll unban through - ".(int)$time." hour(s)");
 				$event->setCancelled();
 			}else{
 				$this->ipBanList->remove($player->getAddress());
